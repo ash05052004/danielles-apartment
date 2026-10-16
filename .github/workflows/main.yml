@@ -1,0 +1,17 @@
+name: Apartment Cron
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  run-cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger payment reminder
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://yourdomain.infinityfreeapp.com/cron_payment_reminder.php?key=danielles_cron_2026'
+          method: 'GET'
+          timeout: 30000
