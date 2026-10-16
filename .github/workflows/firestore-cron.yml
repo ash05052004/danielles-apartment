@@ -17,11 +17,17 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Trigger Firestore
+      - name: Write trigger to Firestore
         run: |
           TOKEN=$(gcloud auth print-access-token)
           curl -X PATCH \
             "https://firestore.googleapis.com/v1/projects/d-apartment554/databases/(default)/documents/triggers/cron" \
             -H "Authorization: Bearer $TOKEN" \
             -H "Content-Type: application/json" \
-            -d '{"fields":{"run":{"booleanValue":true}}}'
+            -d '{"fields":{"run":{"booleanValue":true},"timestamp":{"timestampValue":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"}}}'
+
+      - name: Send Telegram Notification
+        run: |
+          curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+            -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d "text=Danielle's Apartment Reminder: Check the dashboard for pending payments and appointments."
